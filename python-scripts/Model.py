@@ -1,27 +1,47 @@
-from flask import Flask, request, jsonify
-from sklearn.ensemble import RandomForestClassifier
-import pandas as pd
+import csv
 
-app = Flask(__name__)
+# Function to calculate cashback
+def calculate_cashback(transactions):
+    cashback = [min((transaction ** 2) / 2, 10) for transaction in transactions]
+    return cashback
 
-# Placeholder for the model
-model = RandomForestClassifier()
+# Read data from CSV file
+def read_csv(filename):
+    categories = {
+        'food': 0,
+        'shopping': 0,
+        'healthcare': 0,
+        'entertainment': 0
+    }
 
-@app.route('/train', methods=['POST'])
-def train_model():
-    data = request.json
-    df = pd.DataFrame(data)
-    # ... preprocess the data ...
-    # ... train the model ...
-    return jsonify({"message": "Model trained successfully"})
+    with open(filename, 'r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            category = row['category']
+            if category in categories:
+                categories[category] += 1
 
-@app.route('/predict', methods=['POST'])
-def predict():
-    data = request.json
-    df = pd.DataFrame([data])
-    # ... preprocess the data ...
-    prediction = model.predict(df)
-    return jsonify({"prediction": prediction.tolist()})
+    return categories
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+# Calculate cashback for each category
+def calculate_cashback_for_categories(filename):
+    categories = read_csv(filename)
+    transactions = list(categories.values())
+    cashback = calculate_cashback(transactions)
+    return categories, cashback
+
+# Print results
+def print_results(categories, cashback):
+    print('Category\tTransactions\tCashback')
+    print('----------------------------------')
+    for category, transactions, cb in zip(categories.keys(), categories.values(), cashback):
+        print(f'{category}\t\t{transactions}\t\t{cb}%')
+
+# Main function
+def main():
+    filename = 'C:\My OpenSource Contributions\Bitcamp2024-CapitalOne\python-scripts\purchase_data.csv'
+    categories, cashback = calculate_cashback_for_categories(filename)
+    print_results(categories, cashback)
+
+if __name__ == "__main__":
+    main()
