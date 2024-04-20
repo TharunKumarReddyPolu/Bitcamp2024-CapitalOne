@@ -1,17 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
+
+import { useAuth } from "../context/authContext";
+import { useNavigate } from "react-router-dom";
 
 function Signup() {
+  const auth = useAuth();
+  const navigate = useNavigate();
   const [userData, setUserData] = useState({
-    first_name: '',
-    last_name: '',
+    first_name: "",
+    last_name: "",
     address: {
-      street_number: '',
-      street_name: '',
-      city: '',
-      state: '',
-      zip: ''
-    }
+      street_number: "",
+      street_name: "",
+      city: "",
+      state: "",
+      zip: "",
+    },
   });
+  
+  useEffect(() => {
+    if(auth?.user) navigate('/home')
+  }, [auth]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -22,15 +31,17 @@ function Signup() {
         ...userData,
         address: {
           ...userData.address,
-          [name]: value
-        }
+          [name]: value,
+        },
       });
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log('User Data:', userData);
+
+    await auth.signup(userData);
+    navigate("/home");
     // Here, you would typically handle the form submission, e.g., sending data to a backend server
   };
 
@@ -45,6 +56,7 @@ function Signup() {
           onChange={handleChange}
           placeholder="First Name"
           className="block w-full px-4 py-2 border rounded-md"
+          required
         />
         <input
           type="text"
@@ -53,6 +65,7 @@ function Signup() {
           onChange={handleChange}
           placeholder="Last Name"
           className="block w-full px-4 py-2 border rounded-md"
+          required
         />
         <input
           type="text"
@@ -77,6 +90,7 @@ function Signup() {
           onChange={handleChange}
           placeholder="City"
           className="block w-full px-4 py-2 border rounded-md"
+          required
         />
         <input
           type="text"
@@ -85,6 +99,7 @@ function Signup() {
           onChange={handleChange}
           placeholder="State"
           className="block w-full px-4 py-2 border rounded-md"
+          required
         />
         <input
           type="text"
@@ -93,8 +108,12 @@ function Signup() {
           onChange={handleChange}
           placeholder="ZIP Code"
           className="block w-full px-4 py-2 border rounded-md"
+          required
         />
-        <button type="submit" className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        <button
+          type="submit"
+          className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
           Submit
         </button>
       </form>
