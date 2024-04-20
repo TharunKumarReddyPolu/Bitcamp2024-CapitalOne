@@ -19,16 +19,14 @@ function LoginPage() {
   };
 
   useEffect(()=>{
-    if(sessionStorage.getItem('uuid') && sessionStorage.getItem('name')) {
-        navigate('/home')
-    }
-    if(auth?.user) navigate('/home')
+    
+    if(auth?.isLoggedIn) navigate('/home')
   },[auth])
 
   const handleSubmit = async(event) => {
     event.preventDefault();
-    await auth.login(loginData);
-    navigate("/home");
+    const data =  await auth.login(loginData);
+    if(data) navigate("/home");
     // Here, you would typically handle the login logic, e.g., validating the user
   };
 
